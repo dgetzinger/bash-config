@@ -11,8 +11,6 @@ export VISUAL=$EDITOR
 
 BASH_AUXDIR=.bash.d
 
-# TODO: Debian maintainer name and email definitions
-
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Prompt customization and colorization.
@@ -35,6 +33,8 @@ BASH_AUXDIR=.bash.d
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export PS1='\n\[\033[38;5;222m\]$(pwd) \[\033[38;5;107m\]\s-\v [$SHLVL] \[\033[38;5;74m\]\t $(date +%Z)\n\[\033[38;5;137m\][\!] \$ \[\033[0m\]'
 export PS2='\[\033[38;5;137m\] => \[\033[0m\]'
+export PS3='\[\033[38;5;137m\] => \[\033[0m\]'
+export PS4='\[\033[38;5;137m\] => \[\033[0m\]'
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -53,18 +53,10 @@ alias hist='history | grep $1'
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Personal info (name, email, etc.)
+# Source scripts from .bash.d
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-persinfofile="$BASH_AUXDIR/personal_info"
-if [ -r "$persinfofile" ]; then source $persinfofile; fi
+for script in "$BASH_AUXDIR"/*.sh; do
+	if [ -r "$script" ]; then source $script; else true ; fi
+done
 
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Expose proxy functions 'proxyon' and 'proxyoff' when on corporate
-# network.
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-proxyfuncfile="$BASH_AUXDIR/proxyfuncs"
-if [ -r "$proxyfuncfile" ]; then source $proxyfuncfile; fi
-
-# assume proxy
-proxyon
+if type -t proxyon; then proxyon; fi

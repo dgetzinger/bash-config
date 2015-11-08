@@ -13,21 +13,21 @@
 
 # Simple variables: assigned at first encounter
 BASHROOT		?= $(HOME)
-pubfile_list	:= .bash_profile .bashrc .bash_logout
-pvtfile_list 	:= proxyfuncs personal_info
 subdirname		:= .bash.d
 restore_suffix	:= .orig
-subdir			:= $(BASHROOT)/$(subdirname)
+pubfile_list	:= .bash_profile .bashrc .bash_logout
+pvtfile_list	:= $(wildcard $(subdirname)/*.sh)
 pubfiles		:= $(addprefix $(BASHROOT)/,$(pubfile_list))
-pvtfiles		:= $(addprefix $(subdir)/,$(pvtfile_list))
+pvtfiles		:= $(addprefix $(BASHROOT)/,$(pvtfile_list))
 allfiles		:= $(pubfiles) $(pvtfiles)
+subdir			:= $(BASHROOT)/$(subdirname)
 alldirs			:= $(BASHROOT) $(subdir)
+
 BIN				:= /bin
 MKDIR			:= $(BIN)/mkdir -p
 CP				:= $(BIN)/cp -r
 MV				:= $(BIN)/mv
 RM				:= $(BIN)/rm -f
-
 
 # Recursive variables - reevaluated at each encounter
 # Suffix generates iso-like timestamp suffix,
@@ -50,7 +50,7 @@ TMPBACKUP	?=
 # Default target
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .PHONY: install
-install: $(alldirs) $(allfiles)
+install: backup $(alldirs) $(allfiles)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -66,14 +66,12 @@ install: $(alldirs) $(allfiles)
 backup:
 ifeq "$(strip ${SKIPBACKUP})" ""
 	$(QUIET)for file in $(pubfiles) $(pvtfiles); do \
-		if [ -f "$${file}" ]; then	\
-			[ -f "$${file}$(restore_suffix)" ] || $(CP) $${file} $${file}$(restore_suffix); \
-		else true;	\
+		if [ -f "$${file}" -a ! -e "$${file}$(restore_suffix)" ]; then	\
+			$(CP) $${file} $${file}$(restore_suffix); \
 		fi;	\
 	done
 else
-	$(QUIET):
-$(warning pass)
+	$(QUIET)true
 endif
 
 
@@ -99,7 +97,7 @@ cleanall: clean restore
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Explicit rules.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$(BASHROOT)/%: backup %
+$(BASHROOT)/%: %
 ifneq "$(strip ${TMPBACKUP})" ""
 	$(QUIET)if [ -f "$@" ]; then \
 		$(MV) $@ $@$(backup_suffix); \
@@ -113,7 +111,8 @@ $(alldirs):
 
 
 # Print values of variables specified on print line (debugging)
-print-%: ; $(QUIET)echo $* = \'$($*)\'
+print-%:
+	$(QUIET)echo $* = $($*)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
