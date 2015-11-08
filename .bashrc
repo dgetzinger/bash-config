@@ -1,6 +1,27 @@
 # .bashrc
 #
-# Sourced by .bash_profile, thus on every interactive shell.
+# sourced by .bash_profile, thus on every interactive shell.
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# source scripts from .bash.d
+# Do this before setting prompt as non-interactive shells may rely on
+# variables and functions defined in sourced scripts.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+bash_auxdir=.bash.d
+
+for script in "$bash_auxdir"/*.sh; do
+	if [ -r "$script" ]; then source $script; else true; fi
+done
+
+
+if [ -z "$PS1" ]; then return; fi
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Everything from here down applies only to interactive shells.
+# You can test either $PS1 (unset for non-interactive shells) or $1
+# (set to "i" for interactive shells).
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -8,8 +29,6 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export EDITOR=vim
 export VISUAL=$EDITOR
-
-BASH_AUXDIR=.bash.d
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,12 +70,3 @@ alias ll='ls -al'
 alias ..='cd ..'
 alias hist='history | grep $1'
 
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Source scripts from .bash.d
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-for script in "$BASH_AUXDIR"/*.sh; do
-	if [ -r "$script" ]; then source $script; else true ; fi
-done
-
-if type -t proxyon; then proxyon; fi
