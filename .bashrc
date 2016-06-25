@@ -51,15 +51,13 @@ export VISUAL=$EDITOR
 #
 # \[\033[0m\] resets the fg color to the default setting
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export PS1='\n\[\033[38;5;222m\]$(pwd) \[\033[38;5;107m\]\s-\v [$SHLVL] \[\033[38;5;74m\]\t $(date +%Z)\n\[\033[38;5;137m\][\!] \$ \[\033[0m\]'
+export PS1='\n\[\033[38;5;222m\]$(pwd) \[\033[38;5;107m\]\s-\v [$SHLVL] \[\033[38;5;74m\]\t $(date +%Z)
+\[\033[38;5;137m\][\!] \$ \[\033[0m\]'
 export PS2='\[\033[38;5;137m\] => \[\033[0m\]'
 export PS3='\[\033[38;5;137m\] => \[\033[0m\]'
 export PS4='\[\033[38;5;137m\] => \[\033[0m\]'
 
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Aliases
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Colorize ls
 if ls --version > /dev/null 2>&1; then
 	alias ls='ls --color=auto';		# GNU
@@ -67,7 +65,24 @@ else
 	alias ls='ls -G';				# OSX
 fi
 
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Aliases
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 alias ll='ls -al'
 alias ..='cd ..'
 alias hist='history | grep $1'
 
+# myip refers to function defined below
+alias whatsmyip='myip'
+alias showmyip='myip'
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Functions
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# returns current public ip address using dig
+function myip {
+	dig +short myip.opendns.com @resolver1.opendns.com
+}
