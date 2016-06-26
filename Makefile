@@ -10,12 +10,12 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Variables
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pubfile_list	:= .bash_profile .bashrc .bash_logout
+restore_suffix	:= .orig
+subdirname		:= .bash.d
 
 # Simple variables: assigned at first encounter
 BASHROOT		?= $(HOME)
-subdirname		:= .bash.d
-restore_suffix	:= .orig
-pubfile_list	:= .bash_profile .bashrc .bash_logout
 pvtfile_list	:= $(wildcard $(subdirname)/*.sh)
 pubfiles		:= $(addprefix $(BASHROOT)/,$(pubfile_list))
 pvtfiles		:= $(addprefix $(BASHROOT)/,$(pvtfile_list))
@@ -49,8 +49,14 @@ TMPBACKUP	?=
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Default target
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.PHONY: install
-install: backup $(alldirs) $(allfiles)
+.PHONY: install clobber nobackup
+
+# install (default) normally will copy and rename existing files
+# before clobber overwrites the originals
+install: backup clobber
+
+# skip the backup step by executing with target clobber
+clobber nobackup: $(alldirs) $(allfiles)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,9 +87,9 @@ restore:
 	done
 
 
-# Remove any timestamped backup files created by this makefile.
+# Remove any backup files created by this makefile.
 clean:
-	$(QUIET)for file in $(addsuffix *.bak,$(allfiles)); do \
+	$(QUIET)for file in $(addsuffix $(restore_suffix),$(addprefix $(BASHROOT)/,$(pubfile_list))); do \
 		if [ -f "$${file}" ]; then $(RM) "$${file}"; fi \
 	done
 
