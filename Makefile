@@ -49,14 +49,14 @@ TMPBACKUP	?=
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Default target
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.PHONY: install clobber nobackup
+.PHONY: install copy clobber nobackup
 
 # install (default) normally will copy and rename existing files
 # before clobber overwrites the originals
-install: backup clobber
+install: backup copy
 
-# skip the backup step by executing with target clobber
-clobber nobackup: $(alldirs) $(allfiles)
+# skip the backup step by executing with target 'clobber' or 'nobackup'
+copy clobber nobackup: $(alldirs) $(allfiles)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -66,9 +66,7 @@ clobber nobackup: $(alldirs) $(allfiles)
 
 
 # If any preexisting config files are found that would be overwritten,
-# rename those files.
-#
-# Skip this step if the variable SKIPBACKUP is defined and non-empty.
+# rename those files. If a renamed backup file already exists, do not overwrite.
 backup:
 ifeq "$(strip ${SKIPBACKUP})" ""
 	$(QUIET)for file in $(pubfiles) $(pvtfiles); do \

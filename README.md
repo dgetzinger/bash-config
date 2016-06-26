@@ -9,7 +9,7 @@ To copy the configuration files to `$HOME`, simply execute `make` or `make insta
 
     make BASHROOT=/path/to/wherever
 
-By default, if any configuration files are found in the destination directory that will be overwritten by `make`, backup copies of the existing files will be saved in the same directory under the name `<filename>.orig`. To save these backup files from being overwritten by subsequent calls to `make`, move or rename them *before executing `make` again*.
+By default, if any configuration files are found in the destination directory that will be overwritten by `make`, backup copies of the existing files will be saved in the same directory under the name `<filename>.orig`. If an apparent backup file with this name already exists, it will not be overwritten by subsequent calls to `make`, so delete or rename any backup files as soon as they are no longer needed.
 
 If backup files are not needed, skip the backup step either by setting the command-line variable `SKIPBACKUP` to any non-empty value, e.g.:
 
