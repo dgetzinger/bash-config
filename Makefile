@@ -10,90 +10,83 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Variables
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-pubfile_list	:= .bash_profile .bashrc .bash_logout
-restore_suffix	:= .orig
-subdirname		:= .bash.d
+# Filenames omit '.' prefix, which will be added when copied to
+# install directory.
+src_files		:= bash_profile bashrc bash_logout
+scriptdir		:= bash.d
+script_files	:= $(notdir $(wildcard $(scriptdir)/*.sh))
 
-# Simple variables: assigned at first encounter
+# Target directories.
 BASHROOT		?= $(HOME)
-pvtfile_list	:= $(wildcard $(subdirname)/*.sh)
-pubfiles		:= $(addprefix $(BASHROOT)/,$(pubfile_list))
-pvtfiles		:= $(addprefix $(BASHROOT)/,$(pvtfile_list))
-allfiles		:= $(pubfiles) $(pvtfiles)
-subdir			:= $(BASHROOT)/$(subdirname)
-alldirs			:= $(BASHROOT) $(subdir)
+scriptdotdir	:= $(BASHROOT)/$(addprefix .,$(scriptdir))
+alldirs			:= $(BASHROOT) $(scriptdotdir)
 
+# Target files. Adds '.' before file names.
+dotfiles		:= $(addprefix $(BASHROOT)/,$(addprefix .,$(src_files)))
+scripts			:= $(addprefix $(scriptdotdir)/,$(script_files))
+allfiles		:= $(dotfiles) $(scripts)
+
+# Which OS are we running?
+ifeq ($(shell uname),Darwin)
+OS				:= Mac
+else
+OS				:= Linux
+endif
+
+# Commands
 BIN				:= /bin
-MKDIR			:= $(BIN)/mkdir -p
-CP				:= $(BIN)/cp -r
-MV				:= $(BIN)/mv
-RM				:= $(BIN)/rm -f
+GNU_BIN			:= /usr/local/bin
+MKDIR			:= /bin/mkdir -p
+MV				:= /bin/mv
+RM				:= /bin/rm -f
+GREP			:= /usr/bin/egrep
 
-# Recursive variables - reevaluated at each encounter
-# Suffix generates iso-like timestamp suffix,
-# e.g., -20151102083215.bak
-backup_suffix 	= -$(shell date --utc +%Y%m%d%H%M%S).bak
+ifeq ($(OS),Mac)
+# Mac's native cp does not support backup option; use GNU coreutils gcp
+# brew install coreutils
+CP				:= $(GNU_BIN)/gcp
+else
+CP				:= $(BIN)/cp
+endif
 
-
-# Set SKIPBACKUP to non-empty value to skip making restorable backups
-SKIPBACKUP	?=
-
-
-# For debugging
-# Unset QUIET to echo commands
-# Set TMPBACKUP to make timestamped backups each time make is run
-QUIET		?= @
-TMPBACKUP	?= 
+# Flags evaluated recursively as suffix may change between invocations
+# Suffix generates iso-like timestamp suffix, e.g., -20151102083215
+#   -u option forces UTC timestamp
+# If you change the suffix, conform the grep expression under "clean" target
+backup_suffix 	= -$(shell date -u +%Y%m%d%H%M%S)
+backup_flags	= --backup=simple --suffix=$(backup_suffix)
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Default target
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.PHONY: install copy clobber nobackup
+.PHONY: install clobber nobackup skipbackup
 
 # install (default) normally will copy and rename existing files
 # before clobber overwrites the originals
-install: backup copy
+install: $(alldirs) $(allfiles)
 
-# skip the backup step by executing with target 'clobber' or 'nobackup'
-copy clobber nobackup: $(alldirs) $(allfiles)
+# skip the backup--existing files will be *overwritten*
+clobber nobackup skipbackup: backup_flags = 
+clobber nobackup skipbackup: install
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Other targets
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.PHONY: backup restore clean cleanall help
+.PHONY: test_backup clean help
 
+test_backup:
+#TODO: add code that tests whether native cp has backup option and if not, \
+warns user that no backups will be made and confirms that he wishes to \
+continue
 
-# If any preexisting config files are found that would be overwritten,
-# rename those files. If a renamed backup file already exists, do not overwrite.
-backup:
-ifeq "$(strip ${SKIPBACKUP})" ""
-	$(QUIET)for file in $(pubfiles) $(pvtfiles); do \
-		if [ -f "$${file}" -a ! -e "$${file}$(restore_suffix)" ]; then	\
-			$(CP) $${file} $${file}$(restore_suffix); \
-		fi;	\
-	done
-else
-	$(QUIET)true
-endif
-
-
-restore:
-	$(QUIET)for file in $(addsuffix $(restore_suffix),$(addprefix $(BASHROOT)/,$(pubfile_list))); do \
-		[ -f "$$file" ] && $(MV) $$file $${file%.*}; \
-	done
-
-
-# Remove any backup files created by this makefile.
+# Delete backup files
 clean:
-	$(QUIET)for file in $(addsuffix $(restore_suffix),$(addprefix $(BASHROOT)/,$(pubfile_list))); do \
+	$(QUIET)for file in $(addprefix $(BASHROOT)/,$(shell ls -a ${BASHROOT} | $(GREP) "\-\d{14}$$")); \
+	do \
 		if [ -f "$${file}" ]; then $(RM) "$${file}"; fi \
 	done
-
-
-cleanall: clean restore
-
 
 #TODO: add 'help' target that prints out usage instructions
 
@@ -101,22 +94,28 @@ cleanall: clean restore
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Explicit rules.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$(BASHROOT)/%: %
-ifneq "$(strip ${TMPBACKUP})" ""
-	$(QUIET)if [ -f "$@" ]; then \
-		$(MV) $@ $@$(backup_suffix); \
-	fi
-endif
-	$(QUIET)$(CP) $* $@ 
+# Default rule for copying files
+$(BASHROOT)/.%: %
+	$(QUIET)$(CP) $(backup_flags) $* $@ 
 
 
+# Create any target directories that do not already exist
 $(alldirs):
 	$(QUIET)if [ ! -d "$@" ]; then $(MKDIR) "$@"; fi
 
 
-# Print values of variables specified on print line (debugging)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Debugging
+# make -n for dry run; make -d for debugging output
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Unset QUIET on command line to echo commands, e.g. QUIET= make -n
+QUIET			?= @
+
+# Print values of specified variables. This is a target so make exits
+# after printing.
 print-%:
 	$(QUIET)echo $* = $($*)
+
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,4 +127,4 @@ love whoopee:	; $(QUIET)echo "Not until we're married, Buster."
 money:			; $(QUIET)echo "Whaddya got to sell?"
 
 .DEFAULT:
-	$(QUIET)echo "I'm not comfortable with that on the first date."
+	$(QUIET)echo "$@: I'm not comfortable with that on the first date."
