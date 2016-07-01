@@ -72,17 +72,3 @@ fi
 alias ll='ls -al'
 alias ..='cd ..'
 alias hist='history | grep $1'
-
-# myip refers to function defined below
-alias whatsmyip='myip'
-alias showmyip='myip'
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Functions
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# returns current public ip address using dig
-function myip {
-	dig +short myip.opendns.com @resolver1.opendns.com
-}
