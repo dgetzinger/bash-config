@@ -10,7 +10,9 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bash_auxdir=.bash.d
 
-for script in "$bash_auxdir"/*.sh; do
+# Source all shell scripts found in auxiliary directory except those
+# whose names start with an underscore
+for script in "$bash_auxdir"/[^_]*.sh; do
 	if [ -r "$script" ]; then source $script; else true; fi
 done
 

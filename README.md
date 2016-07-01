@@ -26,6 +26,8 @@ Delete any unwanted backup files from the install directory by executing
 
 ## Use ##
 
-`make` copies three files to the destination directory: `.bash_profile`, `.bash_logout`, and `.bashrc`. Of these, `.bashrc` is the most important, containing colorized prompts and other customizations. `.bash_profile` exists only to source `.bashrc` for both interactive and noninteractive shells on Mac and Linux.
+`make` copies three files to the install directory: `.bash_profile`, `.bash_logout`, and `.bashrc`.
 
-In addition to copying these three configuration files to the installation directory, `make` also creates a subdirectory named `.bash.d` under the install directory. On invocation, `.bashrc` searches `.bash.d` and executes any scripts ending in the filename extension `.sh`, making `.bash.d` a useful storage directory for start-up shell scripts such as function definitions.
+Of these, `.bashrc` is the core file that contains most customizations.
+
+In addition to copying these three configuration files to the installation directory, `make` also creates a subdirectory named `.bash.d` under the install directory. On invocation, `.bashrc` searches `.bash.d` and executes any scripts ending in the filename extension `.sh`, making `.bash.d` a useful storage directory for start-up shell scripts such as function definitions. `.bashrc` skips any shell scripts in `.bash.d` whose names start with an underscore (`_`), enabling the user to disable automatic sourcing of particular scripts merely by prefixing an underscore to the script filename.
