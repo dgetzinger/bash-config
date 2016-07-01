@@ -27,8 +27,8 @@ scripts			:= $(addprefix $(scriptdotdir)/,$(script_files))
 allfiles		:= $(dotfiles) $(scripts)
 
 # Which OS are we running?
-ifeq ($(shell uname),Darwin)
-OS				:= Mac
+ifneq (,$(shell uname | grep -i "darwin"))
+OS				:= OSX
 else
 OS				:= Linux
 endif
@@ -41,8 +41,8 @@ MV				:= /bin/mv
 RM				:= /bin/rm -f
 GREP			:= /usr/bin/egrep
 
-ifeq ($(OS),Mac)
-# Mac's native cp does not support backup option; use GNU coreutils gcp
+ifeq ($(OS),OSX)
+# OSX's native cp does not support backup option; use GNU coreutils gcp
 # brew install coreutils
 CP				:= $(GNU_BIN)/gcp
 else
