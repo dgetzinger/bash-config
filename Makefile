@@ -3,7 +3,7 @@
 # Copies specified bash configuration files from development directory
 # to bash root directory.
 #
-# bash root defaults to $HOME; execute 'make BASHROOT=/blah' for
+# bash root defaults to $HOME; execute 'make INSTALL_DIR=/blah' for
 # different destination.
 
 
@@ -17,36 +17,34 @@ scriptdir		:= bash.d
 script_files	:= $(notdir $(wildcard $(scriptdir)/*.sh))
 
 # Target directories.
-BASHROOT		?= $(HOME)
-scriptdotdir	:= $(BASHROOT)/$(addprefix .,$(scriptdir))
-alldirs			:= $(BASHROOT) $(scriptdotdir)
+INSTALL_DIR		?= $(HOME)
+scriptdotdir	:= $(INSTALL_DIR)/$(addprefix .,$(scriptdir))
+alldirs			:= $(INSTALL_DIR) $(scriptdotdir)
 
 # Target files. Adds '.' before file names.
-dotfiles		:= $(addprefix $(BASHROOT)/,$(addprefix .,$(src_files)))
+dotfiles		:= $(addprefix $(INSTALL_DIR)/,$(addprefix .,$(src_files)))
 scripts			:= $(addprefix $(scriptdotdir)/,$(script_files))
 allfiles		:= $(dotfiles) $(scripts)
-
-# Which OS are we running?
-ifneq (,$(shell uname | grep -i "darwin"))
-OS				:= OSX
-else
-OS				:= Linux
-endif
 
 # Commands
 BIN				:= /bin
 GNU_BIN			:= /usr/local/bin
+CP				:= /bin/cp
+GREP			:= /usr/bin/egrep
 MKDIR			:= /bin/mkdir -p
 MV				:= /bin/mv
 RM				:= /bin/rm -f
-GREP			:= /usr/bin/egrep
 
-ifeq ($(OS),OSX)
-# OSX's native cp does not support backup option; use GNU coreutils gcp
+# Which OS are we running?
+# TODO: cygwin
+ifneq (,$(shell uname | grep -i "darwin"))
+# Mac: need to install GNU gcp (part of coreutils) for backup capability,
+# as OSX's native cp does not include a --backup option
 # brew install coreutils
+OS				:= OSX
 CP				:= $(GNU_BIN)/gcp
 else
-CP				:= $(BIN)/cp
+OS				:= Linux
 endif
 
 # Flags evaluated recursively as suffix may change between invocations
@@ -83,7 +81,7 @@ continue
 
 # Delete backup files
 clean:
-	$(QUIET)for file in $(addprefix $(BASHROOT)/,$(shell ls -a ${BASHROOT} | $(GREP) "\-\d{14}$$")); \
+	$(QUIET)for file in $(addprefix $(INSTALL_DIR)/,$(shell ls -a ${INSTALL_DIR} | $(GREP) "\-\d{14}$$")); \
 	do \
 		if [ -f "$${file}" ]; then $(RM) "$${file}"; fi \
 	done
@@ -95,7 +93,7 @@ clean:
 # Explicit rules.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Default rule for copying files
-$(BASHROOT)/.%: %
+$(INSTALL_DIR)/.%: %
 	$(QUIET)$(CP) $(backup_flags) $* $@ 
 
 
