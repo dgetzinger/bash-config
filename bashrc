@@ -53,7 +53,8 @@ export VISUAL=$EDITOR
 #
 # \[\033[0m\] resets the fg color to the default setting
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-export PS1='\n\[\033[38;5;222m\]$(date +"%a %b %d %T %Z") \[\033[38;5;107m\]$(pwd) \[\033[38;5;74m\]\s-\v [$SHLVL]
+export PS_datetimefmt='%a %b %d %T %Z'
+export PS1='\n\[\033[38;5;222m\]$(pwd) \[\033[38;5;107m\]$(date +"$PS_datetimefmt") \[\033[38;5;74m\]\s-\v [$SHLVL]
 \[\033[38;5;137m\][\!] \$ \[\033[0m\]'
 export PS2='\[\033[38;5;137m\] => \[\033[0m\]'
 export PS3='\[\033[38;5;137m\] => \[\033[0m\]'
