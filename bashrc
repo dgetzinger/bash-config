@@ -1,36 +1,58 @@
-# .bashrc
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# sourced by .bash_profile, thus on every interactive shell.
+#  Name:	bashrc - bash runtime control fle
+#
+#  Author:	David C. Getzinger
+#  		<dgetzinger_NOSPAM_777@gmail.com> (delete "_NOSPAM_")
+#
+#  Date:	Sunday July 17, 2016 17:17:19 HKT
+#
+#  Version:	v0.9
+#
+#  License:
+#
+#  NOTES:	File sourced by .bash_profile, thus by interactive and
+# 		non-interactive shells on OSX and Linux.
+#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# source scripts from .bash.d
-# Do this before setting prompt as non-interactive shells may rely on
-# variables and functions defined in sourced scripts.
+# Ensure homebrew directory is in the path
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+brew_dir="/usr/local/bin"
+export PATH=${brew_dir}:$PATH
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# source scripts from .bash.d, skipping files prefixed with an
+# underscore ('_')
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bash_auxdir=.bash.d
 
-# Source all shell scripts found in auxiliary directory except those
-# whose names start with an underscore
 for script in "$bash_auxdir"/[^_]*.sh; do
 	if [ -r "$script" ]; then source $script; else true; fi
 done
 
 
+
+# Exit here if not an interactive shell
 if [ -z "$PS1" ]; then return; fi
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+#######################################################################
 # Everything from here down applies only to interactive shells.
 # You can test either $PS1 (unset for non-interactive shells) or $1
 # (set to "i" for interactive shells).
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#######################################################################
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # General variables
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 set -o vi
-export EDITOR=vim
+export EDITOR=mvim
 export VISUAL=$EDITOR
 
 
@@ -54,6 +76,7 @@ export VISUAL=$EDITOR
 # \[\033[0m\] resets the fg color to the default setting
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export PS_datetimefmt='%a %b %d %T %Z'
+
 export PS1='\n\[\033[38;5;222m\]$(pwd) \[\033[38;5;107m\]$(date +"$PS_datetimefmt") \[\033[38;5;74m\]\s-\v [$SHLVL]
 \[\033[38;5;137m\][\!] \$ \[\033[0m\]'
 export PS2='\[\033[38;5;137m\] => \[\033[0m\]'
