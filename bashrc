@@ -27,6 +27,9 @@ export PATH=${brew_dir}:$PATH
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # source scripts from .bash.d, skipping files prefixed with an
 # underscore ('_')
+#
+# for git-completion.sh see https://github.com/markgandolfo/git-bash-completion.git
+#   (resuffixed here to ".sh" for autosourcing)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 bash_auxdir=.bash.d
 
@@ -102,7 +105,7 @@ alias hist='history | grep $1'
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# pyenv
+# pyenv configuration
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 export PYENV_ROOT=/usr/local/var/pyenv
 export PATH=PYENV_ROOT/bin:$PATH
