@@ -104,5 +104,7 @@ alias hist='history | grep $1'
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # pyenv
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-eval "$(pyenv init -)"
+export PYENV_ROOT=/usr/local/var/pyenv
+export PATH=PYENV_ROOT/bin:$PATH
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
 
