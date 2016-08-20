@@ -5,7 +5,7 @@
 #  Author:	David C. Getzinger
 #  		<dgetzinger_NOSPAM_777@gmail.com> (delete "_NOSPAM_")
 #
-#  Date:	Sunday July 17, 2016 17:17:19 HKT
+#  Date:	Saturday August 20, 2016 20:23:04 HKT
 #
 #  Version:	v0.9
 #
@@ -98,3 +98,11 @@ fi
 alias ll='ls -al'
 alias ..='cd ..'
 alias hist='history | grep $1'
+
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# pyenv
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+eval "$(pyenv init -)"
+
